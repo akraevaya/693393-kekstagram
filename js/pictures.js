@@ -61,7 +61,7 @@ var generateSingleComment = function (sentenceCount) {
 
 var generateComments = function () {
   var comments = [];
-  var commentsCount = getRandomInteger(0, 20);
+  var commentsCount = getRandomInteger(1, 20);
   for (var i = 0; i < commentsCount; i++) {
     var sentenceCount = getRandomInteger(1, 2);
     comments.push(generateSingleComment(sentenceCount));
@@ -110,7 +110,7 @@ var renderPictures = function (pictures) {
   picturesList.appendChild(fragment);
 };
 
-// ---- Генерация коментариев -----
+// ---- Генерация комментариев -----
 
 var getAvatarUrl = function () {
   return 'img/avatar-' + getRandomInteger(1, 6) + '.svg';
@@ -125,12 +125,12 @@ var renderComment = function (templ, comment) {
 };
 
 var renderCommentsList = function (bigPicture, commentsArr) {
-  var commentTemplate = document.querySelector('#social__comment').content.querySelector('.social__comment');
+  var socialComment = bigPicture.querySelector('.social__comment');
   var commentsList = bigPicture.querySelector('.social__comments');
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < commentsArr.length; i++) {
-    var newCommentElement = renderComment(commentTemplate, commentsArr[i]);
+    var newCommentElement = renderComment(socialComment, commentsArr[i]);
     fragment.appendChild(newCommentElement);
   }
 
@@ -149,11 +149,21 @@ var changeBigPicture = function (bigPicture, picture) {
   bigPicture.querySelector('.social__caption').textContent = picture.description;
 };
 
+var hideCommentLoader = function (bigPicture) {
+  bigPicture.querySelector('.social__comment-count').classList.add('visually-hidden');
+};
+
+var hideCommentCount = function (bigPicture) {
+  bigPicture.querySelector('.comments-loader').classList.add('visually-hidden');
+};
+
 var renderBigPicture = function (picture) {
   var bigPicture = document.querySelector('.big-picture');
 
   changeBigPicture(bigPicture, picture);
   renderCommentsList(bigPicture, picture.comments);
+  hideCommentLoader(bigPicture);
+  hideCommentCount(bigPicture);
 };
 
 var picturesArr = renderPicturesArr();
