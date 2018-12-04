@@ -20,6 +20,29 @@ var PHOTO_DESCRIPTION = [
   'Вот это тачка!'
 ];
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+var DEFAULT_EFFECT_LEVEL = 20;
+
+var bigPicture = document.querySelector('.big-picture');
+
+// Работа с миниатюрами
+var picturesList = document.querySelector('.pictures');
+
+// Работа с загрузкой изображения
+var uploadForm = document.querySelector('#upload-file');
+var uploadOverlay = document.querySelector('.img-upload__overlay');
+var uploadCancel = document.querySelector('.img-upload__cancel');
+var uploadEffects = document.querySelector('.img-upload__effects');
+var uploadPreview = document.querySelector('.img-upload__preview');
+
+// Работа с эффектами
+var effectLevelPin = document.querySelector('.effect-level__pin');
+var effectLevelValue = document.querySelector('.effect-level__value');
+
+// Работа с большим изображением
+var bigPictureCancel = document.querySelector('.big-picture__cancel');
+
 // Работа со случайными значениями
 var getRandomElement = function (arr) {
   var randomIndex = Math.floor(Math.random() * (arr.length - 1));
@@ -100,7 +123,6 @@ var renderPhoto = function (templ, photo) {
 
 var renderPictures = function (pictures) {
   var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
-  var picturesList = document.querySelector('.pictures');
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < pictures.length; i++) {
@@ -124,7 +146,7 @@ var renderComment = function (templ, comment) {
   return commentElement;
 };
 
-var renderCommentsList = function (bigPicture, commentsArr) {
+var renderCommentsList = function (commentsArr) {
   var socialComment = bigPicture.querySelector('.social__comment');
   var commentsList = bigPicture.querySelector('.social__comments');
   var fragment = document.createDocumentFragment();
@@ -141,7 +163,7 @@ var renderCommentsList = function (bigPicture, commentsArr) {
   commentsList.appendChild(fragment);
 };
 
-var changeBigPicture = function (bigPicture, picture) {
+var changeBigPicture = function (picture) {
   bigPicture.classList.remove('hidden');
   bigPicture.querySelector('.big-picture__img img').src = picture.url;
   bigPicture.querySelector('.likes-count').textContent = picture.likes;
@@ -149,23 +171,154 @@ var changeBigPicture = function (bigPicture, picture) {
   bigPicture.querySelector('.social__caption').textContent = picture.description;
 };
 
-var hideCommentLoader = function (bigPicture) {
+var hideCommentLoader = function () {
   bigPicture.querySelector('.social__comment-count').classList.add('visually-hidden');
 };
 
-var hideCommentCount = function (bigPicture) {
+var hideCommentCount = function () {
   bigPicture.querySelector('.comments-loader').classList.add('visually-hidden');
 };
 
 var renderBigPicture = function (picture) {
-  var bigPicture = document.querySelector('.big-picture');
-
-  changeBigPicture(bigPicture, picture);
-  renderCommentsList(bigPicture, picture.comments);
-  hideCommentLoader(bigPicture);
-  hideCommentCount(bigPicture);
+  changeBigPicture(picture);
+  renderCommentsList(picture.comments);
+  hideCommentLoader();
+  hideCommentCount();
 };
+
+// -------------- События -----------------
+// ----- Открытие и закрытие попапов ------
+
+var openPopup = function (target) {
+  target.classList.remove('hidden');
+};
+
+var closePopup = function (target) {
+  target.classList.add('hidden');
+};
+
+// ---- Работа с миниатюрами ------
+
+// Закрытие полной картинки по ESC
+var onBigPictureOverlayEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup(bigPicture);
+  }
+};
+
+// Закрытие полной картинки по клику
+var onBigPictureCancelClick = function () {
+  closePopup(bigPicture);
+
+  document.removeEventListener(
+      'keydown',
+      onBigPictureOverlayEscPress
+  );
+};
+
+// Открытие полной картинки по ENTER
+var onPictureEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    openPopup(bigPicture);
+
+    document.addEventListener(
+        'keydown',
+        onBigPictureOverlayEscPress
+    );
+  }
+};
+
+// Открытие картинки по клику
+var onPictureClick = function () {
+  openPopup(bigPicture);
+};
+
+// Добавление обработчиков на все миниатюры
+var addListenersToPictures = function () {
+  var smallPicElements = picturesList.querySelectorAll('.picture');
+
+  for (var i = 0; i < smallPicElements.length; i++) {
+    var smallPic = smallPicElements[i];
+    smallPic.addEventListener('click', onPictureClick);
+    smallPic.addEventListener('keydown', onPictureEnterPress);
+    document.addEventListener('keydown', onBigPictureOverlayEscPress);
+  }
+};
+
+// ---- Работа с формой загрузки ---
+
+// Обработка закрытия формы загрузки по ESC
+var onUploadOverlayEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup(uploadOverlay);
+  }
+};
+
+// Обработка открытия формы загрузки при изменении формы
+var onChangeUploadForm = function () {
+  openPopup(uploadOverlay);
+  document.addEventListener(
+      'keydown',
+      onUploadOverlayEscPress
+  );
+};
+
+// Обработка закрытия формы загрузки по нажатию на крестик
+var onUploadCancelClick = function () {
+  closePopup(uploadOverlay);
+  document.querySelector('#upload-file').value = '';
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
+};
+
+// ---- Работа с эффектами -----
+
+var changeEffectLevel = function (level) {
+  effectLevelValue.value = level;
+};
+
+// Обработка действий по нажатию на ползунок
+var onMouseupEffectLevelPin = function () {
+  var fullWidth = effectLevelPin.parentElement.offsetWidth;
+  var level = Math.floor(effectLevelPin.offsetLeft / (fullWidth / 100));
+
+  changeEffectLevel(level);
+};
+
+// Обработка действий по клику на эффект
+var onEffectClick = function (effectField) {
+  return function () {
+    changeEffectLevel(DEFAULT_EFFECT_LEVEL);
+    uploadPreview.querySelector('img').className = '';
+    uploadPreview.querySelector('img').classList.add('effects__preview--' + effectField.value);
+  };
+};
+
+// Добавление обработчиков на эффекты
+var addEffectsListeners = function () {
+  var effects = uploadEffects.querySelectorAll('.effects__item input');
+
+  for (var i = 0; i < effects.length; i++) {
+    effects[i].addEventListener('click', onEffectClick(effects[i]));
+  }
+};
+
+// -------Сбор изображений и отрисовка --------
 
 var picturesArr = renderPicturesArr();
 renderPictures(picturesArr);
 renderBigPicture(picturesArr[0]);
+
+// Добавление обработчиков для эффектов
+addEffectsListeners();
+
+// Добавление обработчиков для формы загрузки
+uploadForm.addEventListener('change', onChangeUploadForm);
+uploadCancel.addEventListener('click', onUploadCancelClick);
+
+// Добавление обработчиков миниатюр
+addListenersToPictures();
+effectLevelPin.addEventListener('mouseup', onMouseupEffectLevelPin);
+
+// Добавление обработчика большой картинки
+bigPictureCancel.addEventListener('click', onBigPictureCancelClick);
+document.addEventListener('keydown', onBigPictureOverlayEscPress);
