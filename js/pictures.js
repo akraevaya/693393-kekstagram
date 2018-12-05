@@ -30,18 +30,18 @@ var bigPicture = document.querySelector('.big-picture');
 var picturesList = document.querySelector('.pictures');
 
 // Работа с загрузкой изображения
-var uploadForm = document.querySelector('#upload-file');
-var uploadOverlay = document.querySelector('.img-upload__overlay');
-var uploadCancel = document.querySelector('.img-upload__cancel');
-var uploadEffects = document.querySelector('.img-upload__effects');
-var uploadPreview = document.querySelector('.img-upload__preview');
+var uploadForm = picturesList.querySelector('#upload-file');
+var uploadOverlay = picturesList.querySelector('.img-upload__overlay');
+var uploadCancel = picturesList.querySelector('.img-upload__cancel');
+var uploadEffects = picturesList.querySelector('.img-upload__effects');
+var uploadPreview = picturesList.querySelector('.img-upload__preview');
 
 // Работа с эффектами
-var effectLevelPin = document.querySelector('.effect-level__pin');
-var effectLevelValue = document.querySelector('.effect-level__value');
+var effectLevelPin = picturesList.querySelector('.effect-level__pin');
+var effectLevelValue = picturesList.querySelector('.effect-level__value');
 
 // Работа с большим изображением
-var bigPictureCancel = document.querySelector('.big-picture__cancel');
+var bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
 
 // Работа со случайными значениями
 var getRandomElement = function (arr) {
@@ -210,10 +210,7 @@ var onBigPictureOverlayEscPress = function (evt) {
 var onBigPictureCancelClick = function () {
   closePopup(bigPicture);
 
-  document.removeEventListener(
-      'keydown',
-      onBigPictureOverlayEscPress
-  );
+  document.removeEventListener('keydown', onBigPictureOverlayEscPress);
 };
 
 // Открытие полной картинки по ENTER
@@ -221,10 +218,7 @@ var onPictureEnterPress = function (evt) {
   if (evt.keyCode === ENTER_KEYCODE) {
     openPopup(bigPicture);
 
-    document.addEventListener(
-        'keydown',
-        onBigPictureOverlayEscPress
-    );
+    document.addEventListener('keydown', onBigPictureOverlayEscPress);
   }
 };
 
@@ -257,16 +251,13 @@ var onUploadOverlayEscPress = function (evt) {
 // Обработка открытия формы загрузки при изменении формы
 var onChangeUploadForm = function () {
   openPopup(uploadOverlay);
-  document.addEventListener(
-      'keydown',
-      onUploadOverlayEscPress
-  );
+  document.addEventListener('keydown', onUploadOverlayEscPress);
 };
 
 // Обработка закрытия формы загрузки по нажатию на крестик
 var onUploadCancelClick = function () {
   closePopup(uploadOverlay);
-  document.querySelector('#upload-file').value = '';
+  uploadForm.value = '';
   document.removeEventListener('keydown', onUploadOverlayEscPress);
 };
 
