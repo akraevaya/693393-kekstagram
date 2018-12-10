@@ -43,6 +43,9 @@ var effectLevelValue = picturesList.querySelector('.effect-level__value');
 // Работа с большим изображением
 var bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
 
+// Работа с полем ввода для хэштегов
+var hashInput = picturesList.querySelector('.text__hashtags');
+
 // Работа со случайными значениями
 var getRandomElement = function (arr) {
   var randomIndex = Math.floor(Math.random() * (arr.length - 1));
@@ -293,6 +296,79 @@ var addEffectsListeners = function () {
   }
 };
 
+// --------- Валидация формы ----------
+
+// Массив, состояший только из уникальных элементов (исключает повторяющиеся элементы)
+var uniqArray = function (arr) {
+  var newArr = [];
+  for (var i = 0; i < arr.length; i++) {
+    var uniq = true;
+    var currentEl = arr[i].toLowerCase();
+
+    for (var j = 0; j < newArr.length; j++) {
+      uniq = !(newArr[j] === currentEl);
+      if (!uniq) {
+        break;
+      }
+    }
+
+    if (uniq) {
+      newArr.push(currentEl);
+    }
+  }
+  return newArr;
+};
+
+// Поиск одинаковых символов в строке (например, решёток)
+var searchSymbolCountInString = function (str, symb) {
+  var count = 0;
+  for (var i = 0; i < str.length; i++) {
+    if (str[i] === symb) {
+      count++;
+    }
+  }
+
+  return count;
+};
+
+// Ошибки валидации в массиве хэштегов
+var arrayErrors = function (hashArray) {
+  if (hashArray.length > 5) {
+    hashInput.setCustomValidity('нельзя указать больше пяти хэштегов');
+  } else if (uniqArray(hashArray).length !== hashArray.length) {
+    hashInput.setCustomValidity('один и тот же хэштег не может быть использован дважды');
+  } else {
+    hashInput.setCustomValidity('');
+  }
+};
+
+// Ошибки валидации в отдельных хэштегах
+var hashTagErrors = function (hashArray) {
+  for (var i = 0; i < hashArray.length; i++) {
+    var hashTag = hashArray[i];
+    if (hashTag[0] !== '#') {
+      hashInput.setCustomValidity('хэштег начинается с символа #');
+    } else if (hashTag.length === 1) {
+      hashInput.setCustomValidity('хэштег не может состоять только из одной решётки');
+    } else if (searchSymbolCountInString(hashTag, '#') > 1) {
+      hashInput.setCustomValidity('хэштеги разделяются пробелами');
+    } else if (hashTag.length >= 20) {
+      hashInput.setCustomValidity('максимальная длина одного хэштега 20 символов, включая решётку');
+    } else {
+      hashInput.setCustomValidity('');
+    }
+  }
+};
+
+// Валидация формы
+var hashValidation = function () {
+  var hashArray = hashInput.value.split(' ');
+  arrayErrors(hashArray);
+  if (!hashInput.validity.customError) {
+    hashTagErrors(hashArray);
+  }
+};
+
 // -------Сбор изображений и отрисовка --------
 
 var picturesArr = renderPicturesArr();
@@ -313,3 +389,12 @@ effectLevelPin.addEventListener('mouseup', onMouseupEffectLevelPin);
 // Добавление обработчика большой картинки
 bigPictureCancel.addEventListener('click', onBigPictureCancelClick);
 document.addEventListener('keydown', onBigPictureOverlayEscPress);
+
+// Добавление обработчика валидации
+hashInput.addEventListener('input', hashValidation);
+hashInput.addEventListener('focus', function () {
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
+});
+hashInput.addEventListener('blur', function () {
+  document.addEventListener('keydown', onUploadOverlayEscPress);
+});
