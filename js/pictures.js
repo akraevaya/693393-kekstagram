@@ -22,7 +22,9 @@ var PHOTO_DESCRIPTION = [
 
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
-var DEFAULT_EFFECT_LEVEL = 20;
+var DEFAULT_EFFECT_LEVEL = 1;
+
+var DEFAULT_START_LEVEL = '100%';
 
 var bigPicture = document.querySelector('.big-picture');
 
@@ -35,10 +37,15 @@ var uploadOverlay = picturesList.querySelector('.img-upload__overlay');
 var uploadCancel = picturesList.querySelector('.img-upload__cancel');
 var uploadEffects = picturesList.querySelector('.img-upload__effects');
 var uploadPreview = picturesList.querySelector('.img-upload__preview');
+var uploadPreviewImg = picturesList.querySelector('.img-upload__preview img');
 
 // Работа с эффектами
+var effectLevelLine = picturesList.querySelector('.effect-level__line');
 var effectLevelPin = picturesList.querySelector('.effect-level__pin');
 var effectLevelValue = picturesList.querySelector('.effect-level__value');
+var effectLevelDepth = picturesList.querySelector('.effect-level__depth');
+var startCoords = {};
+var dragged = false;
 
 // Работа с большим изображением
 var bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
@@ -248,6 +255,8 @@ var addListenersToPictures = function () {
 var onUploadOverlayEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     closePopup(uploadOverlay);
+    effectLevelPin.style.left = DEFAULT_START_LEVEL;
+    effectLevelDepth.style.width = DEFAULT_START_LEVEL;
   }
 };
 
@@ -262,28 +271,42 @@ var onUploadCancelClick = function () {
   closePopup(uploadOverlay);
   uploadForm.value = '';
   document.removeEventListener('keydown', onUploadOverlayEscPress);
+  effectLevelPin.style.left = DEFAULT_START_LEVEL;
+  effectLevelDepth.style.width = DEFAULT_START_LEVEL;
 };
 
 // ---- Работа с эффектами -----
 
 var changeEffectLevel = function (level) {
-  effectLevelValue.value = level;
+  effectLevelValue.value = level * 100;
+  effectsDepth(level);
 };
 
-// Обработка действий по нажатию на ползунок
-var onMouseupEffectLevelPin = function () {
-  var fullWidth = effectLevelPin.parentElement.offsetWidth;
-  var level = Math.floor(effectLevelPin.offsetLeft / (fullWidth / 100));
+var effectsDepth = function (level) {
+  uploadPreviewImg.style.filter = '';
 
-  changeEffectLevel(level);
+  if (uploadPreviewImg.classList.contains('effects__preview--chrome')) {
+    uploadPreviewImg.style.filter = 'grayscale(' + level + ')';
+  } else if (uploadPreviewImg.classList.contains('effects__preview--sepia')) {
+    uploadPreviewImg.style.filter = 'sepia(' + level + ')';
+  } else if (uploadPreviewImg.classList.contains('effects__preview--marvin')) {
+    uploadPreviewImg.style.filter = 'invert(' + 100 * level + '%)';
+  } else if (uploadPreviewImg.classList.contains('effects__preview--phobos')) {
+    uploadPreviewImg.style.filter = 'blur(' + 3 * level + 'px)';
+  } else if (uploadPreviewImg.classList.contains('effects__preview--heat')) {
+    uploadPreviewImg.style.filter = 'brightness(' + ((2 * level) + 1) + ')';
+  }
 };
 
 // Обработка действий по клику на эффект
 var onEffectClick = function (effectField) {
+
   return function () {
-    changeEffectLevel(DEFAULT_EFFECT_LEVEL);
     uploadPreview.querySelector('img').className = '';
     uploadPreview.querySelector('img').classList.add('effects__preview--' + effectField.value);
+    changeEffectLevel(DEFAULT_EFFECT_LEVEL);
+    effectLevelPin.style.left = DEFAULT_START_LEVEL;
+    effectLevelDepth.style.width = DEFAULT_START_LEVEL;
   };
 };
 
@@ -295,6 +318,72 @@ var addEffectsListeners = function () {
     effects[i].addEventListener('click', onEffectClick(effects[i]));
   }
 };
+
+// Изменение глубины эффекта фильтра
+
+var effectLevelCalculate = function () {
+  return effectLevelPin.offsetLeft / effectLevelLine.offsetWidth;
+};
+
+// DRAG-n-DROP для ползунка
+var setStartCoords = function (x) {
+  startCoords = {
+    x: x
+  };
+};
+
+var calcX = function (clientX) {
+  var newX;
+
+  var rect = effectLevelLine.getBoundingClientRect();
+  if (clientX <= rect.left) {
+    newX = rect.left;
+  } else if (clientX >= rect.right) {
+    newX = rect.right;
+  } else {
+    newX = clientX;
+  }
+
+  return newX;
+};
+
+var onMouseMove = function (moveEvt) {
+  moveEvt.preventDefault();
+  dragged = true;
+  var newX = calcX(moveEvt.clientX);
+  var shift = {
+    x: startCoords.x - newX
+  };
+  setStartCoords(newX);
+
+  effectLevelPin.style.left = (effectLevelPin.offsetLeft - shift.x) + 'px';
+  effectLevelDepth.style.width = (effectLevelDepth.offsetWidth - shift.x) + 'px';
+  var level = effectLevelCalculate();
+  changeEffectLevel(level);
+};
+
+var onClickPreventDefault = function (draggedEvt) {
+  draggedEvt.preventDefault();
+  effectLevelPin.removeEventListener('click', onClickPreventDefault);
+};
+
+var onMouseUp = function (upEvt) {
+  upEvt.preventDefault();
+  document.removeEventListener('mousemove', onMouseMove);
+  document.removeEventListener('mouseup', onMouseUp);
+  if (dragged) {
+    effectLevelPin.addEventListener('click', onClickPreventDefault);
+  }
+};
+
+var onMouseDownDialog = function (evt) {
+  dragged = false;
+  setStartCoords(evt);
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+};
+
+effectLevelPin.addEventListener('mousedown', onMouseDownDialog);
 
 // --------- Валидация формы ----------
 
@@ -384,7 +473,6 @@ uploadCancel.addEventListener('click', onUploadCancelClick);
 
 // Добавление обработчиков миниатюр
 addListenersToPictures();
-effectLevelPin.addEventListener('mouseup', onMouseupEffectLevelPin);
 
 // Добавление обработчика большой картинки
 bigPictureCancel.addEventListener('click', onBigPictureCancelClick);
