@@ -24,8 +24,6 @@ var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
 var DEFAULT_EFFECT_LEVEL = 1;
 
-var DEFAULT_START_LEVEL = '100%';
-
 var bigPicture = document.querySelector('.big-picture');
 
 // Работа с миниатюрами
@@ -250,34 +248,11 @@ var addListenersToPictures = function () {
 };
 
 // ---- Работа с формой загрузки ---
-
-// Обработка закрытия формы загрузки по ESC
-var onUploadOverlayEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
-    closePopup(uploadOverlay);
-    effectLevelPin.style.left = DEFAULT_START_LEVEL;
-    effectLevelDepth.style.width = DEFAULT_START_LEVEL;
-  }
-};
-
-// Обработка открытия формы загрузки при изменении формы
-var onChangeUploadForm = function () {
-  openPopup(uploadOverlay);
-  document.addEventListener('keydown', onUploadOverlayEscPress);
-};
-
-// Обработка закрытия формы загрузки по нажатию на крестик
-var onUploadCancelClick = function () {
-  closePopup(uploadOverlay);
-  uploadForm.value = '';
-  document.removeEventListener('keydown', onUploadOverlayEscPress);
-  effectLevelPin.style.left = DEFAULT_START_LEVEL;
-  effectLevelDepth.style.width = DEFAULT_START_LEVEL;
-};
-
-// ---- Работа с эффектами -----
+// Работа с эффектами
 
 var changeEffectLevel = function (level) {
+  effectLevelPin.style.left = level * 100 + '%';
+  effectLevelDepth.style.width = level * 100 + '%';
   effectLevelValue.value = level * 100;
   effectsDepth(level);
 };
@@ -298,6 +273,28 @@ var effectsDepth = function (level) {
   }
 };
 
+// Обработка закрытия формы загрузки по ESC
+var onUploadOverlayEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup(uploadOverlay);
+    changeEffectLevel(DEFAULT_EFFECT_LEVEL);
+  }
+};
+
+// Обработка открытия формы загрузки при изменении формы
+var onChangeUploadForm = function () {
+  openPopup(uploadOverlay);
+  document.addEventListener('keydown', onUploadOverlayEscPress);
+};
+
+// Обработка закрытия формы загрузки по нажатию на крестик
+var onUploadCancelClick = function () {
+  closePopup(uploadOverlay);
+  uploadForm.value = '';
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
+  changeEffectLevel(DEFAULT_EFFECT_LEVEL);
+};
+
 // Обработка действий по клику на эффект
 var onEffectClick = function (effectField) {
 
@@ -305,8 +302,6 @@ var onEffectClick = function (effectField) {
     uploadPreview.querySelector('img').className = '';
     uploadPreview.querySelector('img').classList.add('effects__preview--' + effectField.value);
     changeEffectLevel(DEFAULT_EFFECT_LEVEL);
-    effectLevelPin.style.left = DEFAULT_START_LEVEL;
-    effectLevelDepth.style.width = DEFAULT_START_LEVEL;
   };
 };
 
@@ -321,8 +316,8 @@ var addEffectsListeners = function () {
 
 // Изменение глубины эффекта фильтра
 
-var effectLevelCalculate = function () {
-  return effectLevelPin.offsetLeft / effectLevelLine.offsetWidth;
+var effectLevelCalculate = function (shift) {
+  return shift / effectLevelLine.offsetWidth;
 };
 
 // DRAG-n-DROP для ползунка
@@ -356,9 +351,7 @@ var onMouseMove = function (moveEvt) {
   };
   setStartCoords(newX);
 
-  effectLevelPin.style.left = (effectLevelPin.offsetLeft - shift.x) + 'px';
-  effectLevelDepth.style.width = (effectLevelDepth.offsetWidth - shift.x) + 'px';
-  var level = effectLevelCalculate();
+  var level = effectLevelCalculate(effectLevelPin.offsetLeft - shift.x);
   changeEffectLevel(level);
 };
 
