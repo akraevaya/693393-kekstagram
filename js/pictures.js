@@ -38,6 +38,7 @@ var uploadPreview = picturesList.querySelector('.img-upload__preview');
 var uploadPreviewImg = picturesList.querySelector('.img-upload__preview img');
 
 // Работа с эффектами
+var effectFielset = picturesList.querySelector('.effect-level');
 var effectLevelLine = picturesList.querySelector('.effect-level__line');
 var effectLevelPin = picturesList.querySelector('.effect-level__pin');
 var effectLevelValue = picturesList.querySelector('.effect-level__value');
@@ -297,10 +298,20 @@ var onUploadCancelClick = function () {
 
 // Обработка действий по клику на эффект
 var onEffectClick = function (effectField) {
+  var hideFielset = false;
+
+  if (effectField.id === 'effect-none') {
+    hideFielset = true;
+  }
 
   return function () {
     uploadPreview.querySelector('img').className = '';
     uploadPreview.querySelector('img').classList.add('effects__preview--' + effectField.value);
+    if (hideFielset) {
+      effectFielset.classList.add('hidden');
+    } else {
+      effectFielset.classList.remove('hidden');
+    }
     changeEffectLevel(DEFAULT_EFFECT_LEVEL);
   };
 };
