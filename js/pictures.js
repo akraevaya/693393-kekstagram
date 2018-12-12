@@ -46,6 +46,11 @@ var effectLevelDepth = picturesList.querySelector('.effect-level__depth');
 var startCoords = {};
 var dragged = false;
 
+// Работа с масштабом изображения
+var scaleControlValue = picturesList.querySelector('.scale__control--value');
+var scaleControlSmaller = picturesList.querySelector('.scale__control--smaller');
+var scaleControlBigger = picturesList.querySelector('.scale__control--bigger');
+
 // Работа с большим изображением
 var bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
 
@@ -388,6 +393,31 @@ var onMouseDownDialog = function (evt) {
 };
 
 effectLevelPin.addEventListener('mousedown', onMouseDownDialog);
+
+// Изменение масштаба фотографии
+
+scaleControlValue.value = '100%';
+
+var onScaleTransform = function (value) {
+  uploadPreviewImg.style.transform = 'scale(' + parseInt(value, 10) / 100 + ')';
+};
+
+var onClickScaleControl = function (evt) {
+  var scaleValue = scaleControlValue.value;
+  var scaleValueInt = parseInt(scaleValue, 10);
+
+  if (evt.target === scaleControlSmaller && scaleValueInt > 25) {
+    scaleValueInt -= 25;
+  } else if (evt.target === scaleControlBigger && scaleValueInt < 100) {
+    scaleValueInt += 25;
+  }
+
+  scaleControlValue.value = scaleValueInt + '%';
+  onScaleTransform(scaleValueInt);
+};
+
+scaleControlSmaller.addEventListener('click', onClickScaleControl);
+scaleControlBigger.addEventListener('click', onClickScaleControl);
 
 // --------- Валидация формы ----------
 
