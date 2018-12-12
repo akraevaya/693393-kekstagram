@@ -290,6 +290,8 @@ var onUploadOverlayEscPress = function (evt) {
 // Обработка открытия формы загрузки при изменении формы
 var onChangeUploadForm = function () {
   openPopup(uploadOverlay);
+  scaleControlValue.value = '100%';
+  onScaleTransform(100);
   document.addEventListener('keydown', onUploadOverlayEscPress);
 };
 
@@ -343,13 +345,13 @@ var setStartCoords = function (x) {
   };
 };
 
-var calcX = function (clientX) {
+var calcX = function (clientX, size) {
   var newX;
 
   var rect = effectLevelLine.getBoundingClientRect();
-  if (clientX <= rect.left) {
+  if (clientX <= rect.left + size) {
     newX = rect.left;
-  } else if (clientX >= rect.right) {
+  } else if (clientX >= rect.right - size) {
     newX = rect.right;
   } else {
     newX = clientX;
@@ -361,14 +363,15 @@ var calcX = function (clientX) {
 var onMouseMove = function (moveEvt) {
   moveEvt.preventDefault();
   dragged = true;
-  var newX = calcX(moveEvt.clientX);
+  var newX = calcX(moveEvt.clientX, effectLevelPin.offsetWidth);
   var shift = {
     x: startCoords.x - newX
   };
-  setStartCoords(newX);
 
   var level = effectLevelCalculate(effectLevelPin.offsetLeft - shift.x);
   changeEffectLevel(level);
+
+  setStartCoords(newX);
 };
 
 var onClickPreventDefault = function (draggedEvt) {
@@ -387,7 +390,8 @@ var onMouseUp = function (upEvt) {
 
 var onMouseDownDialog = function (evt) {
   dragged = false;
-  setStartCoords(evt);
+  var newX = calcX(evt.clientX, effectLevelPin.offsetWidth);
+  setStartCoords(newX);
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
 };
@@ -395,8 +399,6 @@ var onMouseDownDialog = function (evt) {
 effectLevelPin.addEventListener('mousedown', onMouseDownDialog);
 
 // Изменение масштаба фотографии
-
-scaleControlValue.value = '100%';
 
 var onScaleTransform = function (value) {
   uploadPreviewImg.style.transform = 'scale(' + parseInt(value, 10) / 100 + ')';
