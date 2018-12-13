@@ -530,3 +530,6 @@ hashInput.addEventListener('blur', function () {
 commentTextarea.addEventListener('focus', function () {
   document.removeEventListener('keydown', onUploadOverlayEscPress);
 });
+commentTextarea.addEventListener('blur', function () {
+  document.addEventListener('keydown', onUploadOverlayEscPress);
+});
