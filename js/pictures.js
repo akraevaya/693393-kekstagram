@@ -57,6 +57,9 @@ var bigPictureCancel = bigPicture.querySelector('.big-picture__cancel');
 // Работа с полем ввода для хэштегов
 var hashInput = picturesList.querySelector('.text__hashtags');
 
+// Поле ввода комментария
+var commentTextarea = picturesList.querySelector('.text__description');
+
 // Работа со случайными значениями
 var getRandomElement = function (arr) {
   var randomIndex = Math.floor(Math.random() * (arr.length - 1));
@@ -401,7 +404,7 @@ effectLevelPin.addEventListener('mousedown', onMouseDownDialog);
 // Изменение масштаба фотографии
 
 var onScaleTransform = function (value) {
-  uploadPreviewImg.style.transform = 'scale(' + parseInt(value, 10) / 100 + ')';
+  uploadPreview.style.transform = 'scale(' + parseInt(value, 10) / 100 + ')';
 };
 
 var onClickScaleControl = function (evt) {
@@ -521,4 +524,9 @@ hashInput.addEventListener('focus', function () {
 });
 hashInput.addEventListener('blur', function () {
   document.addEventListener('keydown', onUploadOverlayEscPress);
+});
+
+// Чтобы поле комментария не закрывалось по ESC
+commentTextarea.addEventListener('focus', function () {
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
 });
