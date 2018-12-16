@@ -2,6 +2,25 @@
 
 (function () {
   // ---- Генерация фотографий ----- picture.js
+  var PHOTOS_COUNT = 25;
+
+  var PHOTO_COMMENTS = [
+    'Всё отлично!',
+    'В целом всё неплохо. Но не всё.',
+    'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
+    'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
+    'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
+    'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+  ];
+
+  var PHOTO_DESCRIPTION = [
+    'Тестим новую камеру!',
+    'Затусили с друзьями на море',
+    'Как же круто тут кормят',
+    'Отдыхаем...',
+    'Цените каждое мгновенье. Цените тех, кто рядом с вами и отгоняйте все сомненья. Не обижайте всех словами......',
+    'Вот это тачка!'
+  ];
 
   var generatePhotoUrl = function (index) {
     return 'photos/' + index + '.jpg';
@@ -14,7 +33,7 @@
   var generateSingleComment = function (sentenceCount) {
     var comment = [];
     for (var i = 0; i < sentenceCount; i++) {
-      comment.push(window.getRandomElement(window.PHOTO_COMMENTS));
+      comment.push(window.getRandomElement(PHOTO_COMMENTS));
     }
     return comment.join(' ');
   };
@@ -34,7 +53,7 @@
       url: generatePhotoUrl(urlIndex),
       likes: generateLikesNumber(),
       comments: generateComments(),
-      description: window.getRandomElement(window.PHOTO_DESCRIPTION)
+      description: window.getRandomElement(PHOTO_DESCRIPTION)
     };
     return randomPicture;
   };
@@ -42,7 +61,7 @@
   var renderPicturesArr = function () {
     var picArr = [];
 
-    for (var i = 0; i < window.PHOTOS_COUNT; i++) {
+    for (var i = 0; i < PHOTOS_COUNT; i++) {
       picArr.push(renderRandomPicture(i + 1));
     }
     return window.shuffleArray(picArr);
