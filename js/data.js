@@ -13,6 +13,10 @@
 
   window.bigPicture = document.querySelector('.big-picture');
 
+  // Массив объектов изображений (комментарии, описание, url)
+  // Заполняется в picture.js
+  window.picturesArr = [];
+
   // Работа со случайными значениями // data.js
   window.getRandomElement = function (arr) {
     var randomIndex = Math.floor(Math.random() * (arr.length - 1));
@@ -21,17 +25,6 @@
 
   window.getRandomInteger = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  // Перемешивает массив // data.js
-  window.shuffleArray = function (array) {
-    for (var i = array.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
-    }
-    return array;
   };
 
   // ----- Открытие и закрытие попапов ------

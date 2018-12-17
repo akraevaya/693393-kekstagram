@@ -2,7 +2,7 @@
 
 (function () {
 
-  // Работа с загрузкой изображения // form.js
+  // Работа с загрузкой изображения
   var uploadForm = window.picturesList.querySelector('#upload-file');
   var uploadOverlay = window.picturesList.querySelector('.img-upload__overlay');
   var uploadCancel = window.picturesList.querySelector('.img-upload__cancel');
@@ -10,7 +10,7 @@
   var uploadPreview = window.picturesList.querySelector('.img-upload__preview');
   var uploadPreviewImg = window.picturesList.querySelector('.img-upload__preview img');
 
-  // Работа с эффектами // form.js
+  // Работа с эффектами
   var effectFielset = window.picturesList.querySelector('.effect-level');
   var effectLevelLine = window.picturesList.querySelector('.effect-level__line');
   var effectLevelPin = window.picturesList.querySelector('.effect-level__pin');
@@ -19,15 +19,15 @@
   var startCoords = {};
   var dragged = false;
 
-  // Работа с масштабом изображения // form.js
+  // Работа с масштабом изображения
   var scaleControlValue = window.picturesList.querySelector('.scale__control--value');
   var scaleControlSmaller = window.picturesList.querySelector('.scale__control--smaller');
   var scaleControlBigger = window.picturesList.querySelector('.scale__control--bigger');
 
-  // Работа с полем ввода для хэштегов // form.js
+  // Работа с полем ввода для хэштегов
   var hashInput = window.picturesList.querySelector('.text__hashtags');
 
-  // Поле ввода комментария // form.js
+  // Поле ввода комментария //
   var commentTextarea = window.picturesList.querySelector('.text__description');
 
   // Работа с эффектами

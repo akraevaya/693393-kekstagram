@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  // ---- Генерация фотографий ----- picture.js
+
   var PHOTOS_COUNT = 25;
 
   var PHOTO_COMMENTS = [
@@ -48,6 +48,16 @@
     return comments;
   };
 
+  var shuffleArray = function (array) {
+    for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
+    return array;
+  };
+
   var renderRandomPicture = function (urlIndex) {
     var randomPicture = {
       url: generatePhotoUrl(urlIndex),
@@ -58,13 +68,11 @@
     return randomPicture;
   };
 
-  var renderPicturesArr = function () {
-    var picArr = [];
-
+  var buildPicturesArr = function () {
     for (var i = 0; i < PHOTOS_COUNT; i++) {
-      picArr.push(renderRandomPicture(i + 1));
+      window.picturesArr.push(renderRandomPicture(i + 1));
     }
-    return window.shuffleArray(picArr);
+    shuffleArray(window.picturesArr);
   };
 
   var renderPhoto = function (templ, photo) {
@@ -77,23 +85,21 @@
     return pictureElement;
   };
 
-  var renderPictures = function (pictures) {
+  var renderPictures = function () {
     var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < pictures.length; i++) {
-      var newPictureElement = renderPhoto(pictureTemplate, pictures[i]);
+    for (var i = 0; i < window.picturesArr.length; i++) {
+      var newPictureElement = renderPhoto(pictureTemplate, window.picturesArr[i]);
       fragment.appendChild(newPictureElement);
     }
     window.picturesList.appendChild(fragment);
   };
 
-  // Открытие картинки по клику //picture.js
   var onPictureClick = function () {
     window.openPopup(window.bigPicture);
   };
 
-  // Добавление обработчиков на все миниатюры // picture.js
   var addListenersToPictures = function () {
     var smallPicElements = window.picturesList.querySelectorAll('.picture');
 
@@ -107,6 +113,6 @@
 
   addListenersToPictures();
 
-  window.picturesArr = renderPicturesArr();
-  renderPictures(window.picturesArr);
+  buildPicturesArr(); // Заполняет window.picturesArr случайными значениями
+  renderPictures();
 })();

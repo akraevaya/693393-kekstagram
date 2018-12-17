@@ -2,8 +2,6 @@
 
 (function () {
 
-  // ---- Генерация комментариев ----- preview.js
-
   var bigPictureCancel = window.bigPicture.querySelector('.big-picture__cancel');
 
   var getAvatarUrl = function () {
@@ -51,17 +49,16 @@
     window.bigPicture.querySelector('.comments-loader').classList.add('visually-hidden');
   };
 
-  var renderBigPicture = function (picture) {
+  var renderBigPicture = function () {
+    var picture = window.picturesArr[0];
     changeBigPicture(picture);
     renderCommentsList(picture.comments);
     hideCommentLoader();
     hideCommentCount();
   };
 
-  renderBigPicture(window.picturesArr[0]);
+  renderBigPicture();
 
-
-  // Добавление обработчика большой картинки
   bigPictureCancel.addEventListener('click', window.onBigPictureCancelClick);
   document.addEventListener('keydown', window.onBigPictureOverlayEscPress);
 
