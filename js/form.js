@@ -10,6 +10,8 @@
   var uploadPreview = window.picturesList.querySelector('.img-upload__preview');
   var uploadPreviewImg = window.picturesList.querySelector('.img-upload__preview img');
 
+  var form = window.picturesList.querySelector('.img-upload__form');
+
   // Работа с эффектами
   var effectFielset = window.picturesList.querySelector('.effect-level');
   var effectLevelLine = window.picturesList.querySelector('.effect-level__line');
@@ -51,7 +53,7 @@
   var changeEffectLevel = function (level) {
     effectLevelPin.style.left = level * 100 + '%';
     effectLevelDepth.style.width = level * 100 + '%';
-    effectLevelValue.value = level * 100;
+    effectLevelValue.setAttribute('value', level * 100);
     effectsDepth(level);
   };
 
@@ -60,6 +62,7 @@
     if (evt.keyCode === window.util.ESC_KEYCODE) {
       window.closePopup(uploadOverlay);
       changeEffectLevel(window.DEFAULT_EFFECT_LEVEL);
+      uploadForm.setAttribute('value', '');
     }
   };
 
@@ -74,9 +77,9 @@
   // Обработка закрытия формы загрузки по нажатию на крестик
   var onUploadCancelClick = function () {
     window.closePopup(uploadOverlay);
-    uploadForm.value = '';
     document.removeEventListener('keydown', onUploadOverlayEscPress);
     changeEffectLevel(window.DEFAULT_EFFECT_LEVEL);
+    uploadForm.setAttribute('value', '');
   };
 
   // Обработка действий по клику на эффект
@@ -258,5 +261,15 @@
   commentTextarea.addEventListener('blur', function () {
     document.addEventListener('keydown', onUploadOverlayEscPress);
   });
+
+  // Отправка формы
+  var onUploadForm = function (evt) {
+    evt.preventDefault();
+    window.backend.upload(new FormData(form), function () {
+      uploadOverlay.classList.add('hidden');
+    }, window.onError);
+  };
+
+  form.addEventListener('submit', onUploadForm);
 
 })();

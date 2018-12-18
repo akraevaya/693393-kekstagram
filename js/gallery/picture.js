@@ -2,79 +2,6 @@
 
 (function () {
 
-  var PHOTOS_COUNT = 25;
-
-  var PHOTO_COMMENTS = [
-    'Всё отлично!',
-    'В целом всё неплохо. Но не всё.',
-    'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
-    'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
-    'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
-    'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
-  ];
-
-  var PHOTO_DESCRIPTION = [
-    'Тестим новую камеру!',
-    'Затусили с друзьями на море',
-    'Как же круто тут кормят',
-    'Отдыхаем...',
-    'Цените каждое мгновенье. Цените тех, кто рядом с вами и отгоняйте все сомненья. Не обижайте всех словами......',
-    'Вот это тачка!'
-  ];
-
-  var generatePhotoUrl = function (index) {
-    return 'photos/' + index + '.jpg';
-  };
-
-  var generateLikesNumber = function () {
-    return window.getRandomInteger(25, 200);
-  };
-
-  var generateSingleComment = function (sentenceCount) {
-    var comment = [];
-    for (var i = 0; i < sentenceCount; i++) {
-      comment.push(window.getRandomElement(PHOTO_COMMENTS));
-    }
-    return comment.join(' ');
-  };
-
-  var generateComments = function () {
-    var comments = [];
-    var commentsCount = window.getRandomInteger(1, 20);
-    for (var i = 0; i < commentsCount; i++) {
-      var sentenceCount = window.getRandomInteger(1, 2);
-      comments.push(generateSingleComment(sentenceCount));
-    }
-    return comments;
-  };
-
-  var shuffleArray = function (array) {
-    for (var i = array.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
-    }
-    return array;
-  };
-
-  var renderRandomPicture = function (urlIndex) {
-    var randomPicture = {
-      url: generatePhotoUrl(urlIndex),
-      likes: generateLikesNumber(),
-      comments: generateComments(),
-      description: window.getRandomElement(PHOTO_DESCRIPTION)
-    };
-    return randomPicture;
-  };
-
-  var buildPicturesArr = function () {
-    for (var i = 0; i < PHOTOS_COUNT; i++) {
-      window.picturesArr.push(renderRandomPicture(i + 1));
-    }
-    shuffleArray(window.picturesArr);
-  };
-
   var renderPhoto = function (templ, photo) {
     var pictureElement = templ.cloneNode(true);
 
@@ -111,8 +38,14 @@
     }
   };
 
-  addListenersToPictures();
+  var loadPicturesArr = function (newPicArr) {
+    for (var i = 0; i < newPicArr.length; i++) {
+      window.picturesArr.push(newPicArr[i]);
+    }
+    renderPictures();
+    addListenersToPictures();
+    window.renderBigPicture(window.picturesArr[0]);
+  };
 
-  buildPicturesArr(); // Заполняет window.picturesArr случайными значениями
-  renderPictures();
+  window.backend.download(loadPicturesArr, window.onError);
 })();
