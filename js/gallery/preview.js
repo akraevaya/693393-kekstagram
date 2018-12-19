@@ -30,7 +30,6 @@
   };
 
   var changeBigPicture = function (picture) {
-    window.bigPicture.classList.remove('hidden');
     window.bigPicture.querySelector('.big-picture__img img').src = picture.url;
     window.bigPicture.querySelector('.likes-count').textContent = picture.likes;
     window.bigPicture.querySelector('.comments-count').textContent = picture.comments.length;
@@ -54,5 +53,4 @@
 
   bigPictureCancel.addEventListener('click', window.onBigPictureCancelClick);
   document.addEventListener('keydown', window.onBigPictureOverlayEscPress);
-
 })();

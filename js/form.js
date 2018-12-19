@@ -262,14 +262,18 @@
     document.addEventListener('keydown', onUploadOverlayEscPress);
   });
 
+  var onUploadError = function () {
+    uploadOverlay.classList.add('hidden');
+    return window.onError;
+  };
+
   // Отправка формы
   var onUploadForm = function (evt) {
     evt.preventDefault();
     window.backend.upload(new FormData(form), function () {
       uploadOverlay.classList.add('hidden');
-    }, window.onError);
+    }, onUploadError());
   };
 
   form.addEventListener('submit', onUploadForm);
-
 })();
